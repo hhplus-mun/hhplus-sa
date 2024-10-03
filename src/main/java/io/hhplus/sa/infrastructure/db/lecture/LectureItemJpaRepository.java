@@ -1,6 +1,8 @@
 package io.hhplus.sa.infrastructure.db.lecture;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,6 +17,7 @@ public interface LectureItemJpaRepository extends JpaRepository<LectureItemEntit
             "where i.lectureDate = :requestDate and i.capacity > 0")
     List<LectureItemEntity> findOpenItemsByLectureDate(@Param("requestDate") LocalDate requestDate);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select i from LectureItemEntity i " +
             "join fetch i.lecture l " +
             "where i.id = :itemId and i.lecture.id = :lectureId")

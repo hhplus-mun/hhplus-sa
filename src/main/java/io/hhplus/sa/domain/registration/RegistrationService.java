@@ -14,7 +14,6 @@ import java.util.List;
 public class RegistrationService {
 
     private final RegistrationRepository registrationRepository;
-    private final LectureItemRepository lectureItemRepository;
 
     /*
      * [요구사항 분석 및 정리]
