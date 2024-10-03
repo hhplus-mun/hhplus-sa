@@ -57,7 +57,7 @@ class LectureItemRepositoryImplTest {
         Lecture lecture = new Lecture("TDD & CLEAN", "켄트백", LectureCategory.TDD);
         Lecture savedLecture = lectureRepository.save(lecture);
 
-        LocalDate givenDate = LocalDate.now();
+        LocalDate givenDate = LocalDate.of(1950, 6, 25);
         LectureItem lectureItem = new LectureItem(savedLecture, givenDate);
         LectureItem lectureItem1 = new LectureItem(savedLecture, givenDate, 0);
         LectureItem lectureItem2 = new LectureItem(savedLecture, givenDate, 3);

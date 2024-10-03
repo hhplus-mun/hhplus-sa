@@ -3,6 +3,7 @@ package io.hhplus.sa.domain.registration;
 import io.hhplus.sa.domain.exception.MaximumUserRegistrationException;
 import io.hhplus.sa.domain.lecture.Lecture;
 import io.hhplus.sa.domain.lecture.LectureItem;
+import io.hhplus.sa.domain.lecture.LectureItemRepository;
 import io.hhplus.sa.domain.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,8 @@ class RegistrationServiceUnitTest {
     RegistrationService registrationService;
     @Mock
     RegistrationRepository registrationRepository;
+    @Mock
+    LectureItemRepository lectureItemRepository;
 
     @Test
     @DisplayName("[정상]: 정상적으로 특강신청 완료")
@@ -45,6 +48,8 @@ class RegistrationServiceUnitTest {
 
         given(registrationRepository.save(any(Registration.class)))
                 .willReturn(registration);
+        given(lectureItemRepository.save(any(LectureItem.class)))
+                .willReturn(lectureItem);
 
         // when
         Registration saved = registrationService.register(user, lectureItem);
