@@ -1,4 +1,4 @@
-package io.hhplus.architecture;
+package io.hhplus.sa;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
