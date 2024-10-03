@@ -1,5 +1,6 @@
 package io.hhplus.sa.application.registration;
 
+import io.hhplus.sa.domain.exception.AlreadyRegisteredUserException;
 import io.hhplus.sa.domain.exception.MaximumUserRegistrationException;
 import io.hhplus.sa.infrastructure.db.lecture.LectureItemEntity;
 import io.hhplus.sa.infrastructure.db.lecture.LectureItemJpaRepository;
@@ -11,14 +12,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +49,7 @@ class RegistrationFacadeTest {
                 .map(UserEntity::getId)
                 .toList();
 
-        LectureItemEntity entity = lectureItemJpaRepository.findAll().stream().findAny().get();
+        LectureItemEntity entity = lectureItemJpaRepository.findAll().stream().findFirst().get();
 
         long lectureId = entity.getLecture().getId();
         long lectureItemId = entity.getId();
@@ -91,15 +89,15 @@ class RegistrationFacadeTest {
      * io.hhplus.sa.Dummy 클래스를 통해 사전 데이터 삽입
      */
     @Test
-    @DisplayName("[정상]: 5번 신청 시, 1번만 성공")
+    @DisplayName("[정상]: 중복신청 - 5번 신청 시, 1번만 성공")
     void step4() {
-        int userNumber = 5;
-        List<Long> userIds = userJpaRepository.findAll().stream()
-                .filter(u -> u.getId() <= userNumber)
+        List<Long> ids = userJpaRepository.findAll().stream()
                 .map(UserEntity::getId)
                 .toList();
+        Long userId = ids.get(ids.size() - 1);
 
-        LectureItemEntity entity = lectureItemJpaRepository.findAll().stream().findAny().get();
+        List<LectureItemEntity> list = lectureItemJpaRepository.findAll();
+        LectureItemEntity entity = list.get(list.size() - 1);
 
         long lectureId = entity.getLecture().getId();
         long lectureItemId = entity.getId();
@@ -107,11 +105,11 @@ class RegistrationFacadeTest {
         em.flush();
 
         List<Runnable> tasks = new ArrayList<>();
-        for (Long userId : userIds) {
+        for (int i=0; i<5; i++) {
             tasks.add(() -> {
                 try {
                     registrationFacade.registerLecture(new RegistrationCommand.Register(lectureId, lectureItemId, userId));
-                } catch (MaximumUserRegistrationException e) {
+                } catch (AlreadyRegisteredUserException e) {
                 }
             });
         }
@@ -124,13 +122,7 @@ class RegistrationFacadeTest {
         allTask.join();
 
         // then
-        int historyCnt = 0;
-        for (Long userId : userIds) {
-            int historyPerUserId = registrationFacade.getHistory(new RegistrationCommand.History(userId)).size();
-
-            historyCnt += historyPerUserId;
-        }
-
-        assertThat(historyCnt).isEqualTo(1);
+        int historyByUser = registrationFacade.getHistory(new RegistrationCommand.History(userId)).size();
+        assertThat(historyByUser).isEqualTo(1);
     }
 }

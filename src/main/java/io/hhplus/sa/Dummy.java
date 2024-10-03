@@ -25,5 +25,8 @@ public class Dummy {
         }
         Lecture lecture = lectureRepository.save(new Lecture("TDD & CLEAN", "켄트백", LectureCategory.TDD));
         lectureItemRepository.save(new LectureItem(lecture, LocalDate.now()));
+
+        Lecture lecture2 = lectureRepository.save(new Lecture("TDD & CLEAN", "켄트백", LectureCategory.TDD));
+        lectureItemRepository.save(new LectureItem(lecture2, LocalDate.now()));
     }
 }
