@@ -22,7 +22,7 @@ public class RegistrationFacade {
     @Transactional
     public RegistrationResult.Register registerLecture(RegistrationCommand.Register command) {
         User activeUser = userService.getActiveUser(command.userId());
-        LectureItem lectureItem = lectureService.getLectureItem(command.lectureId(), command.lectureItemId());
+        LectureItem lectureItem = lectureService.getLectureItemForLecture(command.lectureItemId(), command.lectureId());
 
         Registration registration = registrationService.register(activeUser, lectureItem);
         return new RegistrationResult.Register(

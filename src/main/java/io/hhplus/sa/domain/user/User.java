@@ -16,6 +16,7 @@ public class User {
 
     public User(String name) {
         this.name = name;
+        this.active = true;
     }
 
     public static User from(UserEntity e) {

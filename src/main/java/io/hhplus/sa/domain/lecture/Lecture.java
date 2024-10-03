@@ -4,11 +4,13 @@ import io.hhplus.sa.infrastructure.db.lecture.LectureEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 import static io.hhplus.sa.domain.exception.ExceptionMessage.ENTITY_IS_NULL;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@ToString
 public class Lecture {
     private Long id;
     private String name;

@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface LectureItemRepository {
-    LectureItem getByItemIdWithId(long lectureId, long itemId);
+
+    LectureItem save(LectureItem lectureItem);
+    LectureItem findLectureItemByIdAndLectureId(long itemId, long lectureId);
 
     List<LectureItem> findOpenItemsByLectureDate(LocalDate requestDate);
 }

@@ -20,11 +20,6 @@ public class RegistrationRepositoryImpl implements RegistrationRepository {
     }
 
     @Override
-    public long countByLectureId(Long lectureId) {
-        return registrationJpaRepository.countByLectureItemId(lectureId);
-    }
-
-    @Override
     public List<Registration> findHistoryByUserId(Long userId) {
         return registrationJpaRepository.findRegistrationHistoryByUserId(userId)
                 .stream()

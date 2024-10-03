@@ -4,6 +4,7 @@ import io.hhplus.sa.domain.lecture.Lecture;
 import io.hhplus.sa.domain.lecture.LectureRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,6 +13,12 @@ import java.util.List;
 public class LectureRepositoryImpl implements LectureRepository {
 
     private final LectureJpaRepository lectureJpaRepository;
+
+    @Override
+    public Lecture save(Lecture lecture) {
+        LectureEntity entity = lectureJpaRepository.save(lecture.toEntity());
+        return Lecture.from(entity);
+    }
 
     @Override
     public Lecture getById(Long id) {

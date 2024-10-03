@@ -17,12 +17,8 @@ public class LectureService {
         return lectureRepository.findAll();
     }
 
-    public Lecture getLecture(Long lectureId) {
-        return lectureRepository.getById(lectureId);
-    }
-
-    public LectureItem getLectureItem(long lectureId, long itemId) {
-        return lectureItemRepository.getByItemIdWithId(lectureId, itemId);
+    public LectureItem getLectureItemForLecture(long itemId, long lectureId) {
+        return lectureItemRepository.findLectureItemByIdAndLectureId(itemId, lectureId);
     }
 
     public List<LectureItem> getOpenLectureItemList(String date, long userId) {

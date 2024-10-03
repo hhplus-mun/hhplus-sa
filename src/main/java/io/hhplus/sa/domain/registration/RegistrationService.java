@@ -25,11 +25,11 @@ public class RegistrationService {
      *
      * 이미 강의에 등록된 이용자가 30명이라면 > MaximumUserRegistrationException
      */
-    public Registration register(User user, LectureItem item) {
-        if (item.getCapacity() == 0) throw new MaximumUserRegistrationException();
-        item.acceptUser();
+    public Registration register(User user, LectureItem lecture) {
+        if (lecture.getCapacity() == 0) throw new MaximumUserRegistrationException();
+        lecture.registerUser();
 
-        return registrationRepository.save(new Registration(user, item));
+        return registrationRepository.save(new Registration(user, lecture));
     }
 
     // 특강 ID 및 이름, 강연자 정보

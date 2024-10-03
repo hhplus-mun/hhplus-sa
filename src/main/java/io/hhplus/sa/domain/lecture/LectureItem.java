@@ -1,6 +1,5 @@
 package io.hhplus.sa.domain.lecture;
 
-import io.hhplus.sa.domain.exception.ExceptionMessage;
 import io.hhplus.sa.infrastructure.db.lecture.LectureItemEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,6 +12,8 @@ import static io.hhplus.sa.domain.exception.ExceptionMessage.ENTITY_IS_NULL;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LectureItem {
+    private static int DEFAULT_CAPACITY = 30;
+
     private Long id;
     private Lecture lecture;
     private LocalDate lectureDate;
@@ -22,6 +23,10 @@ public class LectureItem {
         this.lecture = lecture;
         this.lectureDate = lectureDate;
         this.capacity = capacity;
+    }
+
+    public LectureItem(Lecture lecture, LocalDate lectureDate) {
+        this(lecture, lectureDate, DEFAULT_CAPACITY);
     }
 
     public static LectureItem from(LectureItemEntity e) {
@@ -39,7 +44,7 @@ public class LectureItem {
         return new LectureItemEntity(id, lecture.toEntity(), lectureDate, capacity);
     }
 
-    public void acceptUser() {
+    public void registerUser() {
         capacity--;
     }
 }
