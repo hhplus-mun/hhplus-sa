@@ -5,4 +5,5 @@ import java.util.List;
 public interface RegistrationRepository {
     Registration save(Registration registration);
     List<Registration> findHistoryByUserId(Long lectureId);
+    Long countByUserIdAndLectureItemId(Long userId, Long lectureItemId);
 }

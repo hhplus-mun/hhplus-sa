@@ -1,8 +1,10 @@
 package io.hhplus.sa.application.registration;
 
-import io.hhplus.sa.domain.lecture.*;
-import io.hhplus.sa.domain.user.User;
-import io.hhplus.sa.domain.user.UserRepository;
+import io.hhplus.sa.domain.exception.MaximumUserRegistrationException;
+import io.hhplus.sa.infrastructure.db.lecture.LectureItemEntity;
+import io.hhplus.sa.infrastructure.db.lecture.LectureItemJpaRepository;
+import io.hhplus.sa.infrastructure.db.user.UserEntity;
+import io.hhplus.sa.infrastructure.db.user.UserJpaRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
@@ -12,10 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,32 +31,42 @@ class RegistrationFacadeTest {
     RegistrationFacade registrationFacade;
 
     @Autowired
-    UserRepository userRepository;
+    UserJpaRepository userJpaRepository;
     @Autowired
-    LectureRepository lectureRepository;
-    @Autowired
-    LectureItemRepository lectureItemRepository;
+    LectureItemJpaRepository lectureItemJpaRepository;
+
     @PersistenceContext
     EntityManager em;
 
+    /**
+     * io.hhplus.sa.Dummy 클래스를 통해 사전 데이터 삽입
+     */
     @Test
     @DisplayName("[정상]: 40명 신청 시, 30명만 성공")
-    @Rollback(value = false)
     void step3() {
         // given
         int userNumber = 40;
-        List<Long> userIds = getUserIdList(userNumber);
+        List<Long> userIds = userJpaRepository.findAll().stream()
+                .filter(u -> u.getId() <= userNumber)
+                .map(UserEntity::getId)
+                .toList();
 
-        Pair idPair = getLectureIdPair();
-        long lectureId = idPair.lectureId;
-        long lectureItemId = idPair.lectureItemId;
+        LectureItemEntity entity = lectureItemJpaRepository.findAll().stream().findAny().get();
+
+        long lectureId = entity.getLecture().getId();
+        long lectureItemId = entity.getId();
 
         em.flush();
 
         List<Runnable> tasks = new ArrayList<>();
         for (Long userId : userIds) {
-            tasks.add(() ->
-                    registrationFacade.registerLecture(new RegistrationCommand.Register(lectureId, lectureItemId, userId)));
+            tasks.add(() -> {
+                try {
+                    registrationFacade.registerLecture(new RegistrationCommand.Register(lectureId, lectureItemId, userId));
+                } catch (MaximumUserRegistrationException e) {
+                    System.out.println("MaximumUserRegistrationException - userId: " + userId);
+                }
+            });
         }
 
         // when
@@ -74,28 +87,50 @@ class RegistrationFacadeTest {
         assertThat(historyCnt).isEqualTo(30);
     }
 
-    private Pair getLectureIdPair() {
-        Lecture lecture = lectureRepository.save(
-                new Lecture("TDD & CLEAN", "켄트백", LectureCategory.TDD)
-        );
-        LectureItem lectureItem = lectureItemRepository.save(new LectureItem(lecture, LocalDate.now()));
+    /**
+     * io.hhplus.sa.Dummy 클래스를 통해 사전 데이터 삽입
+     */
+    @Test
+    @DisplayName("[정상]: 5번 신청 시, 1번만 성공")
+    void step4() {
+        int userNumber = 5;
+        List<Long> userIds = userJpaRepository.findAll().stream()
+                .filter(u -> u.getId() <= userNumber)
+                .map(UserEntity::getId)
+                .toList();
 
-        return new Pair(lecture.getId(), lectureItem.getId());
-    }
+        LectureItemEntity entity = lectureItemJpaRepository.findAll().stream().findAny().get();
 
-    private List<Long> getUserIdList(int n) {
-        List<Long> ids = new ArrayList<>();
+        long lectureId = entity.getLecture().getId();
+        long lectureItemId = entity.getId();
 
-        for (int i=1; i<=n; i++) {
-            User user = userRepository.save(new User("t" + i));
-            ids.add(user.getId());
+        em.flush();
+
+        List<Runnable> tasks = new ArrayList<>();
+        for (Long userId : userIds) {
+            tasks.add(() -> {
+                try {
+                    registrationFacade.registerLecture(new RegistrationCommand.Register(lectureId, lectureItemId, userId));
+                } catch (MaximumUserRegistrationException e) {
+                }
+            });
         }
 
-        return ids;
-    }
+        // when
+        CompletableFuture allTask =
+                CompletableFuture.allOf(
+                        tasks.stream().map(task -> runAsync(task)).toArray(CompletableFuture[]::new)
+                );
+        allTask.join();
 
-    public record Pair(
-            long lectureId,
-            long lectureItemId
-    ) {}
+        // then
+        int historyCnt = 0;
+        for (Long userId : userIds) {
+            int historyPerUserId = registrationFacade.getHistory(new RegistrationCommand.History(userId)).size();
+
+            historyCnt += historyPerUserId;
+        }
+
+        assertThat(historyCnt).isEqualTo(1);
+    }
 }
