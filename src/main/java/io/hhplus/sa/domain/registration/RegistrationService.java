@@ -1,5 +1,6 @@
 package io.hhplus.sa.domain.registration;
 
+import io.hhplus.sa.domain.exception.AlreadyRegisteredUserException;
 import io.hhplus.sa.domain.exception.MaximumUserRegistrationException;
 import io.hhplus.sa.domain.lecture.LectureItem;
 import io.hhplus.sa.domain.lecture.LectureItemRepository;
@@ -14,6 +15,7 @@ import java.util.List;
 public class RegistrationService {
 
     private final RegistrationRepository registrationRepository;
+    private final LectureItemRepository lectureItemRepository;
 
     /*
      * [요구사항 분석 및 정리]
@@ -26,9 +28,18 @@ public class RegistrationService {
      */
     public Registration register(User user, LectureItem lecture) {
         if (lecture.getCapacity() == 0) throw new MaximumUserRegistrationException();
-        lecture.registerUser();
+        if (isRegistered(user.getId(), lecture.getId())) throw new AlreadyRegisteredUserException("해당 특강을 이미 신청한 사용자입니다.");
 
-        return registrationRepository.save(new Registration(user, lecture));
+        Registration registration = registrationRepository.save(new Registration(user, lecture));
+        lecture.registerUser();
+        lectureItemRepository.save(lecture);
+
+        return registration;
+    }
+
+    protected boolean isRegistered(Long userId, Long lectureItemId) {
+        return registrationRepository.countByUserIdAndLectureItemId(userId, lectureItemId) > 0
+                ? true : false;
     }
 
     // 특강 ID 및 이름, 강연자 정보

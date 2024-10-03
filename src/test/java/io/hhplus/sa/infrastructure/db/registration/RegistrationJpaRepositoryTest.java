@@ -15,7 +15,7 @@ class RegistrationJpaRepositoryTest {
     RegistrationJpaRepository registrationJpaRepository;
 
     @Test
-    @DisplayName("이력 조회 쿼리 테스트")
+    @DisplayName("[정상]: JPA - 이력 조회 쿼리 테스트")
     void historyQuery() {
         // given
         long userId = 1L;
@@ -24,5 +24,14 @@ class RegistrationJpaRepositoryTest {
         List<RegistrationEntity> registrations = registrationJpaRepository.findRegistrationHistoryByUserId(userId);
 
         assertThat(registrations.size()).isZero();
+    }
+
+    @Test
+    @DisplayName("[정상]: JPA - 조회 쿼리 테스트")
+    void registration() {
+        long userId = 1L;
+        long lectureItemId = 1L;
+
+        registrationJpaRepository.countByUserIdAndLectureItemId(userId, lectureItemId);
     }
 }

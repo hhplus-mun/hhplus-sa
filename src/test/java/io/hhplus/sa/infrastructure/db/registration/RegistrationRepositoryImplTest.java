@@ -71,4 +71,22 @@ class RegistrationRepositoryImplTest {
         // then
         assertThat(history.size()).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("[정상]: 사용자의 특강 등록카운트 조회")
+    void count() {
+        // given
+        User givenUser = userRepository.save(new User("James"));
+
+        Lecture lecture = new Lecture("TDD & CLEAN", "켄트백", LectureCategory.TDD);
+        Lecture savedLecture = lectureRepository.save(lecture);
+        LectureItem lectureItem = lectureItemRepository.save(new LectureItem(savedLecture, LocalDate.now(), 30));
+        registrationRepository.save(new Registration(givenUser, lectureItem));
+
+        // when
+        Long count = registrationRepository.countByUserIdAndLectureItemId(givenUser.getId(), lectureItem.getId());
+
+        // then
+        assertThat(count).isGreaterThan(0);
+    }
 }

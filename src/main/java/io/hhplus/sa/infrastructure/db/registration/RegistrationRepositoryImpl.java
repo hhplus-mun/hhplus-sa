@@ -26,4 +26,9 @@ public class RegistrationRepositoryImpl implements RegistrationRepository {
                 .map(Registration::from)
                 .toList();
     }
+
+    @Override
+    public Long countByUserIdAndLectureItemId(Long userId, Long lectureItemId) {
+        return registrationJpaRepository.countByUserIdAndLectureItemId(userId, lectureItemId);
+    }
 }
