@@ -18,7 +18,7 @@ public class LectureService {
     }
 
     public LectureItem getLectureItemForLecture(long itemId, long lectureId) {
-        return lectureItemRepository.findLectureItemByIdAndLectureId(itemId, lectureId);
+        return lectureItemRepository.findLectureItemByIdAndLectureIdWithPessimisticLock(itemId, lectureId);
     }
 
     public List<LectureItem> getOpenLectureItemList(String date, long userId) {
