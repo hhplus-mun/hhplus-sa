@@ -60,7 +60,7 @@ class LectureServiceUnitTest {
         ReflectionTestUtils.setField(lecture, "id", lectureId);
         ReflectionTestUtils.setField(lectureItem, "id", itemId);
 
-        given(lectureItemRepository.findLectureItemByIdAndLectureId(lectureId, itemId))
+        given(lectureItemRepository.findLectureItemByIdAndLectureIdWithPessimisticLock(lectureId, itemId))
                 .willReturn(lectureItem);
 
         // when
@@ -77,12 +77,12 @@ class LectureServiceUnitTest {
         long lectureId = 1L;
         long itemId = -1L;
 
-        given(lectureItemRepository.findLectureItemByIdAndLectureId(itemId, lectureId))
+        given(lectureItemRepository.findLectureItemByIdAndLectureIdWithPessimisticLock(itemId, lectureId))
                 .willThrow(IllegalArgumentException.class);
 
         // when & then
         assertThatThrownBy(
-                () -> lectureItemRepository.findLectureItemByIdAndLectureId(itemId, lectureId));
+                () -> lectureItemRepository.findLectureItemByIdAndLectureIdWithPessimisticLock(itemId, lectureId));
     }
 
     @Test

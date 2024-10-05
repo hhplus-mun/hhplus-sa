@@ -18,6 +18,7 @@ public class LectureItem {
     private Lecture lecture;
     private LocalDate lectureDate;
     private int capacity;
+    private int registrationCount;
 
     public LectureItem(Lecture lecture, LocalDate lectureDate, int capacity) {
         this.lecture = lecture;
@@ -36,15 +37,17 @@ public class LectureItem {
                 e.getId(),
                 Lecture.from(e.getLecture()),
                 e.getLectureDate(),
-                e.getCapacity()
+                e.getCapacity(),
+                e.getRegistrationCount()
         );
     }
 
     public LectureItemEntity toEntity() {
-        return new LectureItemEntity(id, lecture.toEntity(), lectureDate, capacity);
+        return new LectureItemEntity(id, lecture.toEntity(), lectureDate, capacity, registrationCount);
     }
 
     public void registerUser() {
+        registrationCount++;
         capacity--;
     }
 }

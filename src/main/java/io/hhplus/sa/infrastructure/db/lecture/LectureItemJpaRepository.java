@@ -21,5 +21,5 @@ public interface LectureItemJpaRepository extends JpaRepository<LectureItemEntit
     @Query("select i from LectureItemEntity i " +
             "join fetch i.lecture l " +
             "where i.id = :itemId and i.lecture.id = :lectureId")
-    Optional<LectureItemEntity> findLectureItemByIdAndLectureId(@Param("itemId") long itemId, @Param("lectureId") long lectureId);
+    Optional<LectureItemEntity> findLectureItemByIdAndLectureIdWithPessimisticLock(@Param("itemId") long itemId, @Param("lectureId") long lectureId);
 }

@@ -28,6 +28,6 @@ class LectureItemJpaRepositoryTest {
         long lectureId = 1L;
         long lectureItemId = 1L;
 
-        itemJpaRepository.findLectureItemByIdAndLectureId(lectureId, lectureItemId);
+        itemJpaRepository.findLectureItemByIdAndLectureIdWithPessimisticLock(lectureId, lectureItemId);
     }
 }

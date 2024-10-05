@@ -25,4 +25,5 @@ public class LectureItemEntity {
 
     private LocalDate lectureDate;
     private int capacity;
+    private int registrationCount;
 }

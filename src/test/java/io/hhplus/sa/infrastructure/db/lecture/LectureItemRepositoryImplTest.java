@@ -3,7 +3,6 @@ package io.hhplus.sa.infrastructure.db.lecture;
 import io.hhplus.sa.domain.lecture.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ class LectureItemRepositoryImplTest {
         em.flush();
 
         // when
-        LectureItem foundItem = lectureItemRepository.findLectureItemByIdAndLectureId(savedLectureItem.getId(), savedLecture.getId());
+        LectureItem foundItem = lectureItemRepository.findLectureItemByIdAndLectureIdWithPessimisticLock(savedLectureItem.getId(), savedLecture.getId());
 
         // then
         assertThat(foundItem.getLecture().getName()).isEqualTo(lecture.getName());

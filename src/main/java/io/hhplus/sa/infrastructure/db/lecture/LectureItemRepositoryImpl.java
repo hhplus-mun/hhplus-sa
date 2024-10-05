@@ -21,8 +21,8 @@ public class LectureItemRepositoryImpl implements LectureItemRepository {
     }
 
     @Override
-    public LectureItem findLectureItemByIdAndLectureId(long itemId, long lectureId) {
-        LectureItemEntity entity = lectureItemJpaRepository.findLectureItemByIdAndLectureId(itemId, lectureId)
+    public LectureItem findLectureItemByIdAndLectureIdWithPessimisticLock(long itemId, long lectureId) {
+        LectureItemEntity entity = lectureItemJpaRepository.findLectureItemByIdAndLectureIdWithPessimisticLock(itemId, lectureId)
                 .orElseThrow(() -> new IllegalArgumentException());
         return LectureItem.from(entity);
     }
